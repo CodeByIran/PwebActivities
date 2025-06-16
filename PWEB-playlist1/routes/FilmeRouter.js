@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Filme } from '../models/Filme';
+import { Filme } from '../models/Filme.js';
 
 const router = Router();
 

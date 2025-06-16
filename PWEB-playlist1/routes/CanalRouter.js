@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Canal } from '../models/Canal';
+import { Canal } from '../models/Canal.js';
 
 const router = Router();
 
