@@ -65,5 +65,6 @@ export {
   CanalFilme,
   Playlist,
   Comentario,
-  Mensalidade
+  Mensalidade,
+  PlaylistFilme
 };
