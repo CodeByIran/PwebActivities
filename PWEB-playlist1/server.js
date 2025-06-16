@@ -1,28 +1,29 @@
-// server.js (ou outro nome que você preferir)
-import { sequelize, Usuario, Filme, Canal, CanalFilme, Playlist, Comentario } from './models/Index.js';
+// server.js
 import express from 'express';
 import bodyParser from 'body-parser';
+import { sequelize } from './models/Index.js';
+import router from './routes/routes.js'; // <- centralizador de rotas
 
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middlewares
+app.use(bodyParser.json());
+app.use('/api', router);
+
+// Inicia o servidor
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Conexão com o banco de dados estabelecida com sucesso.');
+    console.log('✅ Conectado ao banco de dados com sucesso.');
 
-    await sequelize.sync({ alter: true }); // Isso agora criará TODAS as tabelas com base em todos os modelos importados e relacionados
-    console.log('✅ Tabelas sincronizadas com sucesso.');
+    await sequelize.sync({ alter: true });
+    console.log('✅ Tabelas sincronizadas.');
 
-    // Exemplo de uso:
-    const novoUsuario = await Usuario.create({
-      login: 'thiago2.oliveira',
-      nome: 'Thiago2 Oliveira',
-      email: 'thiago2soliveira@ifal.edu.br'
+    app.listen(port, () => {
+      console.log(`🚀 Servidor rodando em http://localhost:${port}`);
     });
-
-    const usuarios = await Usuario.findAll();
-    console.log(`Total de usuários: ${usuarios.length}`);
   } catch (error) {
-    console.error('❌ Erro ao conectar ou sincronizar o banco de dados:', error);
-  } finally {
-    await sequelize.close();
+    console.error('❌ Erro ao conectar ou iniciar o servidor:', error);
   }
 })();
