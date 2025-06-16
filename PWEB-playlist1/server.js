@@ -1,5 +1,7 @@
 // server.js (ou outro nome que você preferir)
 import { sequelize, Usuario, Filme, Canal, CanalFilme, Playlist, Comentario } from './models/Index.js';
+import express from 'express';
+import bodyParser from 'body-parser';
 
 (async () => {
   try {
