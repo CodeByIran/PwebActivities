@@ -27,6 +27,8 @@ export default (sequelize) => {
         },
         data_comentario: {
             type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
             validate: {
                 isNotFuture(value) {
                     if (new Date(value) > new Date()) {
