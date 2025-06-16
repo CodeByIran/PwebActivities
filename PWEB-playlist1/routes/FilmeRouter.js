@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { Filme } from '../models/Filme.js';
+import { Filme } from '../models/Index.js'; // ✅ certo
+
 
 const router = Router();
 

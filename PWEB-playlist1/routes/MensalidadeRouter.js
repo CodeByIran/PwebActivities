@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Mensalidade } from '../models/Mensalidade.js';
+import { Mensalidade } from '../models/Index.js';
 
 const router = Router();
 

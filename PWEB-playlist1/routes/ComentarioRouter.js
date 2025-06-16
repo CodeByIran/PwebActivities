@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Comentario } from '../models/Mensalidade.js';
+import { Comentario } from '../models/Index.js';
 
 const router = Router();
 

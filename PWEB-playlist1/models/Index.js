@@ -6,6 +6,7 @@ import CanalFilmeModel from './CanalFilme.js';
 import PlaylistModel from './Playlist.js';
 import ComentarioModel from './Comentario.js';
 import MensalidadeModel from './Mensalidade.js';
+import PlaylistFilmeModel from './PlaylistFilme.js'; 
 
 const Mensalidade = MensalidadeModel(sequelize);
 const Usuario = UsuarioModel(sequelize);
@@ -14,6 +15,19 @@ const Canal = CanalModel(sequelize);
 const CanalFilme = CanalFilmeModel(sequelize);
 const Playlist = PlaylistModel(sequelize);
 const Comentario = ComentarioModel(sequelize);
+const PlaylistFilme = PlaylistFilmeModel(sequelize);
+
+
+Playlist.belongsToMany(Filme, {
+  through: PlaylistFilme,
+  foreignKey: 'id_playlist',
+  otherKey: 'id_filme',
+});
+Filme.belongsToMany(Playlist, {
+  through: PlaylistFilme,
+  foreignKey: 'id_filme',
+  otherKey: 'id_playlist',
+});
 
 // RELACIONAMENTOS
 Canal.belongsToMany(Filme, {

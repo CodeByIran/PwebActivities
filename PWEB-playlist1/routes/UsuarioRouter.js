@@ -1,6 +1,6 @@
 // routes/UsuarioRouter.js
 import { Router } from 'express';
-import { Usuario } from '../models/Usuario.js';
+import { Usuario } from '../models/Index.js'; // ✅ certo
 
 const router = Router();
 

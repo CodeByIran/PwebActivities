@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Playlist } from '../models/Playlist.js';
+import { Playlist } from '../models/Index.js';
 
 const router = Router();
 
