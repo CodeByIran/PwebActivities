@@ -1,21 +1,27 @@
 import { expect } from 'chai';
 import { sequelize, db } from './setup.js';
 
-describe('Comentario Model', () => {
-  it('Deve criar um comentário com dados válidos', async () => {
-    const usuario = await db.Usuario.create({
+describe('Comentario Model - Testes personalizados', () => {
+  let usuario, filme;
+
+  beforeEach(async () => {
+    // Cria um usuário e um filme antes de cada teste
+    usuario = await db.Usuario.create({
       login: 'teste123',
       nome: 'Usuário Teste',
+      email: 'teste123@ifal.edu.br',
     });
 
-    const filme = await db.Filme.create({
+    filme = await db.Filme.create({
       titulo: 'Filme Teste',
       genero: 'Ação',
       duracao: 120,
       ano_lancamento: 2023,
       nota_avaliacao: 8.5,
     });
+  });
 
+  it('Cria comentário válido e verifica associações', async () => {
     const comentario = await db.Comentario.create({
       id_usuario: usuario.id,
       id_filme: filme.id,
@@ -30,56 +36,53 @@ describe('Comentario Model', () => {
     expect(parseFloat(comentario.avaliacao)).to.equal(9);
   });
 
-  it('Não deve criar um comentário sem texto', async () => {
-    const usuario = await db.Usuario.create({
-      login: 'teste123',
-      nome: 'Usuário Teste',
-    });
-
-    const filme = await db.Filme.create({
-      titulo: 'Filme Teste',
-      genero: 'Ação',
-      duracao: 120,
-      ano_lancamento: 2023,
-      nota_avaliacao: 8.5,
-    });
-
+  it('Não cria comentário sem texto', async () => {
     try {
       await db.Comentario.create({
         id_usuario: usuario.id,
         id_filme: filme.id,
-        avaliacao: 9.0,
+        avaliacao: 7.5,
       });
-      expect.fail('Deveria ter lançado um erro de validação');
+      expect.fail('Erro esperado de validação por falta de texto');
+    } catch (error) {
+      expect(error.name).to.equal('SequelizeValidationError');
+      const mensagens = error.errors.map(err => err.message);
+      expect(
+        mensagens.some(
+          msg =>
+            msg.includes('cannot be null') ||
+            msg.includes('comentário') ||
+            msg.includes('texto')
+        )
+      ).to.be.true;
+    }
+  });
+
+  it('Não cria comentário com avaliação inválida (> 10)', async () => {
+    try {
+      await db.Comentario.create({
+        id_usuario: usuario.id,
+        id_filme: filme.id,
+        texto: 'Comentário inválido',
+        avaliacao: 11,
+      });
+      expect.fail('Erro esperado por nota acima de 10');
     } catch (error) {
       expect(error.name).to.equal('SequelizeValidationError');
     }
   });
 
-  it('Não deve criar um comentário com avaliacao fora do intervalo', async () => {
-    const usuario = await db.Usuario.create({
-      login: 'teste123',
-      nome: 'Usuário Teste',
+  it('Atualiza comentário existente', async () => {
+    const comentario = await db.Comentario.create({
+      id_usuario: usuario.id,
+      id_filme: filme.id,
+      texto: 'Bom filme!',
+      avaliacao: 7.0,
     });
 
-    const filme = await db.Filme.create({
-      titulo: 'Filme Teste',
-      genero: 'Ação',
-      duracao: 120,
-      ano_lancamento: 2023,
-      nota_avaliacao: 8.5,
-    });
+    await comentario.update({ texto: 'Excelente filme!', avaliacao: 9.5 });
 
-    try {
-      await db.Comentario.create({
-        id_usuario: usuario.id,
-        id_filme: filme.id,
-        texto: 'Comentário Inválido',
-        avaliacao: 11,
-      });
-      expect.fail('Deveria ter lançado um erro de validação');
-    } catch (error) {
-      expect(error.name).to.equal('SequelizeValidationError');
-    }
+    expect(comentario.texto).to.equal('Excelente filme!');
+    expect(parseFloat(comentario.avaliacao)).to.equal(9.5);
   });
 });

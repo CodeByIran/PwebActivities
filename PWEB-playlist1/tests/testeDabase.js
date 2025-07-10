@@ -62,7 +62,6 @@ describe('Mensalidade Model', () => {
       nome: 'Usuário Teste',
     });
 
-    // Teste 1: Mês inválido (13)
     try {
       await db.Mensalidade.create({
         id_usuario: usuario.id,
@@ -77,7 +76,6 @@ describe('Mensalidade Model', () => {
       expect(error.message).to.include('Mês deve estar entre 01 e 12');
     }
 
-    // Teste 2: Formato inválido
     try {
       await db.Mensalidade.create({
         id_usuario: usuario.id,
@@ -92,7 +90,6 @@ describe('Mensalidade Model', () => {
       expect(error.message).to.include('Formato de ano_mes deve ser YYYY-MM');
     }
 
-    // Teste 3: Ano inválido
     try {
       await db.Mensalidade.create({
         id_usuario: usuario.id,

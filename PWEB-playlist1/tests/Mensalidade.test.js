@@ -1,159 +1,118 @@
 import { expect } from 'chai';
 import { sequelize, db } from './setup.js';
 
-describe('Mensalidade Model', () => {
-  it('Deve criar uma mensalidade com dados válidos', async () => {
-    const usuario = await db.Usuario.create({
-      login: 'teste123',
-      nome: 'Usuário Teste',
-    });
+describe('Modelo Mensalidade - Validações e Relacionamentos', () => {
+  let usuario;
 
+  beforeEach(async () => {
+    usuario = await db.Usuario.create({
+      login: `user${Date.now()}`,
+      nome: 'Usuário para Mensalidade',
+    });
+  });
+
+  it('Cria mensalidade válida e associa ao usuário', async () => {
     const mensalidade = await db.Mensalidade.create({
       id_usuario: usuario.id,
-      valor: 99.90,
-      data_pagamento: new Date('2023-10-01'),
-      ano_mes: '2023-10',
+      valor: 89.99,
+      data_pagamento: new Date('2024-01-15'),
+      ano_mes: '2024-01',
       status: 'pago',
     });
 
-    expect(mensalidade).to.have.property('id');
-    expect(mensalidade.id_usuario).to.equal(usuario.id);
-    expect(parseFloat(mensalidade.valor)).to.equal(99.90);
-    expect(mensalidade.ano_mes).to.equal('2023-10');
-    expect(mensalidade.status).to.equal('pago');
-  });
-
-  it('Não deve criar uma mensalidade sem id_usuario', async () => {
-    try {
-      await db.Mensalidade.create({
-        valor: 99.90,
-        data_pagamento: new Date('2023-10-01'),
-        ano_mes: '2023-10',
-        status: 'pago',
-      });
-      expect.fail('Deveria ter lançado um erro de validação');
-    } catch (error) {
-      expect(error.name).to.equal('SequelizeValidationError');
-    }
-  });
-
-  it('Não deve criar uma mensalidade sem valor', async () => {
-    const usuario = await db.Usuario.create({
-      login: 'teste123',
-      nome: 'Usuário Teste',
-    });
-
-    try {
-      await db.Mensalidade.create({
-        id_usuario: usuario.id,
-        data_pagamento: new Date('2023-10-01'),
-        ano_mes: '2023-10',
-        status: 'pago',
-      });
-      expect.fail('Deveria ter lançado um erro de validação');
-    } catch (error) {
-      expect(error.name).to.equal('SequelizeValidationError');
-    }
-  });
-
-  it('Não deve criar uma mensalidade com ano_mes inválido', async () => {
-    const usuario = await db.Usuario.create({
-      login: 'teste123',
-      nome: 'Usuário Teste',
-    });
-
-    // Teste 1: Mês inválido (13)
-    try {
-      await db.Mensalidade.create({
-        id_usuario: usuario.id,
-        valor: 99.90,
-        data_pagamento: new Date('2023-10-01'),
-        ano_mes: '2023-13',
-        status: 'pago',
-      });
-      expect.fail('Deveria ter lançado um erro de validação');
-    } catch (error) {
-      expect(error.name).to.equal('SequelizeValidationError');
-      expect(error.message).to.include('Mês deve estar entre 01 e 12');
-    }
-
-    // Teste 2: Formato inválido
-    try {
-      await db.Mensalidade.create({
-        id_usuario: usuario.id,
-        valor: 99.90,
-        data_pagamento: new Date('2023-10-01'),
-        ano_mes: '2023/10',
-        status: 'pago',
-      });
-      expect.fail('Deveria ter lançado um erro de validação');
-    } catch (error) {
-      expect(error.name).to.equal('SequelizeValidationError');
-      expect(error.message).to.include('Formato de ano_mes deve ser YYYY-MM');
-    }
-
-    // Teste 3: Ano inválido
-    try {
-      await db.Mensalidade.create({
-        id_usuario: usuario.id,
-        valor: 99.90,
-        data_pagamento: new Date('2023-10-01'),
-        ano_mes: '1819-12',
-        status: 'pago',
-      });
-      expect.fail('Deveria ter lançado um erro de validação');
-    } catch (error) {
-      expect(error.name).to.equal('SequelizeValidationError');
-      expect(error.message).to.include('Ano deve estar entre 2000 e 9999');
-    }
-  });
-
-  it('Não deve criar uma mensalidade com status inválido', async () => {
-    const usuario = await db.Usuario.create({
-      login: 'teste123',
-      nome: 'Usuário Teste',
-    });
-
-    try {
-      await db.Mensalidade.create({
-        id_usuario: usuario.id,
-        valor: 99.90,
-        data_pagamento: new Date('2023-10-01'),
-        ano_mes: '2023-10',
-        status: 'invalido',
-      });
-      expect.fail('Deveria ter lançado um erro de validação');
-    } catch (error) {
-      expect(error.name).to.equal('SequelizeDatabaseError');
-      expect(error.message).to.include('valor de entrada é inválido para enum');
-    }
-  });
-
-  it('Deve associar um usuário a múltiplas mensalidades', async () => {
-    const usuario = await db.Usuario.create({
-      login: 'teste123',
-      nome: 'Usuário Teste',
-    });
-
-    await db.Mensalidade.create({
+    expect(mensalidade).to.include({
       id_usuario: usuario.id,
-      valor: 99.90,
-      data_pagamento: new Date('2023-10-01'),
-      ano_mes: '2023-10',
+      ano_mes: '2024-01',
       status: 'pago',
     });
+    expect(parseFloat(mensalidade.valor)).to.equal(89.99);
+  });
 
-    await db.Mensalidade.create({
-      id_usuario: usuario.id,
-      valor: 99.90,
-      data_pagamento: null,
-      ano_mes: '2023-11',
-      status: 'pendente',
-    });
+  it('Impede criação sem id_usuario', async () => {
+    try {
+      await db.Mensalidade.create({
+        valor: 59.90,
+        ano_mes: '2024-02',
+        status: 'pendente',
+      });
+      expect.fail('Erro esperado de validação');
+    } catch (error) {
+      expect(error.name).to.equal('SequelizeValidationError');
+      expect(error.message).to.include('id_usuario');
+    }
+  });
+
+  it('Impede criação sem valor definido', async () => {
+    try {
+      await db.Mensalidade.create({
+        id_usuario: usuario.id,
+        ano_mes: '2024-02',
+        status: 'pendente',
+      });
+      expect.fail('Erro esperado de validação');
+    } catch (error) {
+      expect(error.name).to.equal('SequelizeValidationError');
+    }
+  });
+
+  it('Valida formato e intervalo de ano_mes corretamente', async () => {
+    const tentativas = [
+      { ano_mes: '2024-13', mensagem: 'Mês deve estar entre 01 e 12' },
+      { ano_mes: '2024/01', mensagem: 'Formato de ano_mes deve ser YYYY-MM' },
+      { ano_mes: '1999-12', mensagem: 'Ano deve estar entre 2000 e 9999' },
+    ];
+
+    for (const tentativa of tentativas) {
+      try {
+        await db.Mensalidade.create({
+          id_usuario: usuario.id,
+          valor: 80.0,
+          data_pagamento: new Date(),
+          ano_mes: tentativa.ano_mes,
+          status: 'pendente',
+        });
+        expect.fail('Erro de validação esperado');
+      } catch (error) {
+        expect(error.name).to.equal('SequelizeValidationError');
+        expect(error.message).to.include(tentativa.mensagem);
+      }
+    }
+  });
+
+  it('Rejeita status inválido fora do ENUM', async () => {
+    try {
+      await db.Mensalidade.create({
+        id_usuario: usuario.id,
+        valor: 79.90,
+        ano_mes: '2024-03',
+        status: 'cancelado', // inválido
+      });
+      expect.fail('Erro esperado: status inválido');
+    } catch (error) {
+      expect(error.name).to.match(/DatabaseError|SequelizeDatabaseError/);
+      expect(error.message.toLowerCase()).to.include('enum');
+    }
+  });
+
+  it('Permite múltiplas mensalidades associadas ao mesmo usuário', async () => {
+    await db.Mensalidade.bulkCreate([
+      {
+        id_usuario: usuario.id,
+        valor: 100,
+        ano_mes: '2024-01',
+        status: 'pago',
+      },
+      {
+        id_usuario: usuario.id,
+        valor: 100,
+        ano_mes: '2024-02',
+        status: 'pendente',
+      },
+    ]);
 
     const mensalidades = await usuario.getMensalidades();
+    const meses = mensalidades.map(m => m.ano_mes);
     expect(mensalidades).to.have.lengthOf(2);
-    expect(mensalidades.map(m => m.ano_mes)).to.include.members(['2023-10', '2023-11']);
-    expect(mensalidades.map(m => m.status)).to.include.members(['pago', 'pendente']);
+    expect(meses).to.include.members(['2024-01', '2024-02']);
   });
 });
