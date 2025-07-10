@@ -4,9 +4,10 @@ import { sequelize, db } from './setup.js';
 describe('Comentario2 Model - Validações adicionais', () => {
     let usuario, filme;
 
-    beforeEach(async () => {
-        // Limpa e recria o banco antes de cada teste
-        await sequelize.sync({ force: true });
+   beforeEach(async () => {
+    await db.Comentario.destroy({ where: {} });
+    await db.Usuario.destroy({ where: {} });
+    await db.Filme.destroy({ where: {} });
 
         usuario = await db.Usuario.create({
             login: 'teste123',

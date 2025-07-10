@@ -1,5 +1,5 @@
-import sequelize from '../config/database.js'; // Importa a instância do Sequelize
-import { Usuario } from '../models/Index.js'; // Importa o modelo do Usuário
+import sequelize from './config/database.js'; // Importa a instância do Sequelize
+import { Usuario } from './models/Index.js'; // Importa o modelo do Usuário
 
 async function testModels() {
   try {
@@ -22,8 +22,6 @@ async function testModels() {
     console.log('Usuário encontrado:', usuarioBusca.toJSON());
   } catch (error) {
     console.error('Erro ao criar ou buscar usuário:', error);
-  } finally {
-    sequelize.close();
   }
 }
 

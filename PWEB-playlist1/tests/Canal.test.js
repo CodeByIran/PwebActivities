@@ -5,16 +5,7 @@ describe('Configuração do Ambiente de Testes', () => {
   before(async () => {
     await sequelize.sync({ force: true }); 
   });
-
-  after(async () => {
-    await sequelize.close(); 
-  });
-
-  afterEach(async () => {
   
-    await db.Usuario.destroy({ where: {}, truncate: true });
-  });
-
   it('Deve conectar ao banco PostgreSQL', async () => {
     await sequelize.authenticate();
     expect(sequelize.config.database).to.equal('playlist_test');

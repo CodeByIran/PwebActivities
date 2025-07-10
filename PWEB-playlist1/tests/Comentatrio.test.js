@@ -5,6 +5,11 @@ describe('Comentario Model - Testes personalizados', () => {
   let usuario, filme;
 
   beforeEach(async () => {
+    // Limpa as tabelas na ordem certa para não causar erros de FK
+    await db.Comentario.destroy({ where: {}, truncate: true, cascade: true, restartIdentity: true });
+    await db.Filme.destroy({ where: {}, truncate: true, cascade: true, restartIdentity: true });
+    await db.Usuario.destroy({ where: {}, truncate: true, cascade: true, restartIdentity: true });
+
     // Cria um usuário e um filme antes de cada teste
     usuario = await db.Usuario.create({
       login: 'teste123',

@@ -22,8 +22,6 @@ async function testModels() {
     console.log('Usuário encontrado:', usuarioBusca.toJSON());
   } catch (error) {
     console.error('Erro ao criar ou buscar usuário:', error);
-  } finally {
-    sequelize.close();
   }
 }
 
